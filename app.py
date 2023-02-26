@@ -1,11 +1,5 @@
 from flask import Flask, request, url_for, render_template
-from pywebio.platform.flask import webio_view
-from pywebio import STATIC_PATH
-from pywebio.input import *
-from pywebio.output import *
-import argparse
-from pywebio import start_server
-
+from sklearn.preprocessing import StandardScaler
 import pickle
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -15,8 +9,7 @@ model=pickle.load(open('model.pkl', 'rb'))
 def home():
    return render_template('index.html')
 
-standard_to = StandardScaler()
-@app.route("/predict",methods=['POST'])
+""" @app.route("/predict",methods=['POST'])
 def predict():
     if request.method == 'POST':
         WC = float(request.form['wc'])
@@ -37,21 +30,17 @@ def predict():
         else:
             return render_template('index.html',pred='Patient  is safe Patient doesnot have CKD')
     else:
-        return render_template('index.html')
+        return render_template('index.html') """
+    
+@app.route("/predict",methods=['POST'])
+def predict():
+    data = [float(x) for x in request.form.values()]
+    final_output = StandardScaler.transform(np.array(list(data.values())).reshsap(1, -1))
+    prediction = model.predict(final_output)
+    if prediction==1:
+        return render_template('index.html',pred='Patient has Chronic Kidney Disease. ')
+    else:
+        return render_template('index.html',pred='Patient  is safe Patient doesnot have CKD')
 
-app.add_url_rule('/tool', 'webio_view', webio_view(predict), methods=['GET','POST', 'OPTIONS'])
-
-# if __name__ == '__main__':
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("-p", "--port", type=int, default=8080)
-#     args = parser.parse_args()
-#     start_server(predict, port=args.port)
 if __name__=='__main__':
      app.run()
-    
-# if __name__=='__main__':
-#      app.run(debug=True)
-
-
-
-# app.run(host='localhost', port=80)
