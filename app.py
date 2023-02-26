@@ -3,6 +3,7 @@ from sklearn.preprocessing import StandardScaler
 import pickle
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+
 app=Flask(__name__)
 model=pickle.load(open('model.pkl', 'rb'))
 @app.route('/', methods=['GET'])
@@ -35,8 +36,9 @@ def predict():
 @app.route("/predict",methods=['POST'])
 def predict():
     data = [float(x) for x in request.form.values()]
-    final_output = StandardScaler.transform(np.array(list(data.values())).reshsap(1, -1))
-    prediction = model.predict(final_output)
+    # final_output = StandardScaler.transform(np.array(list(data.values())).reshape(1, -1))
+    print(data)
+    prediction = model.predict([data])
     if prediction==1:
         return render_template('index.html',pred='Patient has Chronic Kidney Disease. ')
     else:
